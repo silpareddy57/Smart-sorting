@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Sorting</title>
+</head>
+<body>
+    <h1>Welcome to Smart Sorting</h1>
+    <p>This is your homepage built with Flask.</p>
+</body>
+</html>

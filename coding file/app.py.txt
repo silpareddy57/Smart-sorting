@@ -1,0 +1,36 @@
+from flask import Flask, request, render_template
+import tensorflow as tf
+from PIL import Image
+import numpy as np
+import os
+
+app = Flask(__name__)
+model = tf.keras.models.load_model("model/model.h5")
+
+def preprocess_image(img_path):
+    img = Image.open(img_path).resize((150, 150))
+    img = np.array(img) / 255.0
+    return np.expand_dims(img, axis=0)
+
+@app.route("/", methods=["GET"])
+def index():
+    return render_template("index.html")
+
+@app.route("/predict", methods=["POST"])
+def predict():
+    if "image" not in request.files:
+        return "No image uploaded", 400
+
+    image_file = request.files["image"]
+    image_path = os.path.join("static", image_file.filename)
+    image_file.save(image_path)
+
+    img_array = preprocess_image(image_path)
+    prediction = model.predict(img_array)
+    class_names = ["fresh", "rotten"]
+    predicted_label = class_names[int(prediction[0][0] > 0.5)]
+
+    return render_template("index.html", prediction=predicted_label.capitalize())
+
+if __name__ == "__main__":
+    app.run(debug=True)
